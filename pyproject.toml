@@ -10,8 +10,8 @@ dependencies = []
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
-#[project.scripts]
-#<скрипт> = "путь"
+[project.scripts]
+start = "main:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
