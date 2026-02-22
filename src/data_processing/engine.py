@@ -34,20 +34,21 @@ class Books_handler:
 	
 	@staticmethod
 	def __check_title(title: str) -> str:
-		text = title
-		if not title:
+		text = title.strip()
+		if not text:
 			text = "Unknown"
 		else: 
-			text = text.title().strip()
+			text = " ".join(text.split())
+			text = text.title()
 		return text
 	
 	@staticmethod
 	def __check_author(author: str) -> str:
-		new_author = author
+		new_author = author.strip()
 		if not new_author:
 			new_author = "Unknown"
 		else:
-			new_author = new_author.title().strip()
+			new_author = new_author.title()
 		return new_author
 	
 	@staticmethod

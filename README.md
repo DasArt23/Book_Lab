@@ -15,15 +15,17 @@
 
 ## Вывод программы после запуска проекта
 ```
-Title: The War of the Worlds   | Author: H.G. Wells
-ID: 123
-Meta: source=Test, category=Audio, tags=[]
-Title: The War Of The Worlds | Author: H.G. Wells
-ID: 123
-Meta: source=Test, category=Audio, tags=[]
-Книги не одинаковы
+Получено данных: 2
+
+Изменения:
+Title: The War   of the Worlds -> The War Of The Worlds
+
+Изменения:
+Title:   Вишневый сад -> Вишневый Сад
+Author: А.П. чехов -> А.П. Чехов
 
 Больше изменений нет
+Количетсов изменений: 2
 Программа завершилась успешно
 ```
 
