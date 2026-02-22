@@ -11,14 +11,14 @@ class Books_source:
 	def get_books(self) -> list[Book]:
 		books_list = [
 			Book(
-				title="The War of the Worlds  ",
+				title="The War   of the Worlds",
 				recorder_id=123,
 				author="H.G. Wells",
 			),
 			Book(
-				title="Вишневый Сад",
+				title="  Вишневый сад",
 				recorder_id=100,
-				author="А.П. Чехов",
+				author="А.П. чехов",
 			)
 		]
 		return books_list
