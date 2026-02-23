@@ -7,6 +7,7 @@ import string
 import json
 
 class Books_source(ABC):
+	"""Базовый интерфейс источника данных"""
 	_name = "Demo source"
 	_source_type = "demo"
 	
@@ -26,83 +27,71 @@ class FileJSON_source(Books_source):
 	_name = "JSON source"
 	_source_type = "json"
 	
-	def __init__(self, path: str = 'file.json'):
-		self.path = Path(__file__).parent / path
+	def __init__(self, path: str = 'json_files/file.json'):
+		self.path = (Path(__file__).parent / path).resolve()
 	
 	def get_books(self) -> list[Book]:
 		data, sl = [], dict()
 		
-		if not self.__check_path():
-			return data
+		if not self.path.is_file():
+			return []
 		
 		try:
 			with open(self.path, 'r', encoding='utf-8') as file:
 				sl = json.load(file)
-		except:
-			return data
+		except (json.JSONDecodeError, OSError):
+			return []
 			
 		for title in sl.keys():
 			book_js = sl[title]
 			book_js['title'] = title
-			book = Book(**{f"_{k}": v for k, v in book_js.items()})
-			book.set_source(self._name)
+			book = Book(**book_js).set_source(self._name)
 			data.append(book)
 		return data
-	
-	def __check_path(self) -> bool:
-		file = Path(self.path)
-		if file.is_file():
-			return True
-		return False
 
 class Rand_source(Books_source):
 	_name = "Random source"
 	_source_type = "generator"
 	
-	def __init__(self, amount: int = 1, title_len: int = 10):
+	def __init__(self, amount: int = 1):
 		self.amount = max(amount, 1)
-		self.title_len = max(title_len, 1)
+		self.rw = RandomWord()
 		
 	def __get_rand_title(self) -> str:
-		r = RandomWord()
-		title = r.word(include_categories=["adjective"]) + " " + r.word(include_categories=['noun'])
+		title = self.rw.word(include_categories=["adjective"]) + " " + self.rw.word(include_categories=['noun'])
 		return title
 	
 	@staticmethod
 	def __get_rand_id() -> int:
 		return random.randint(1000, 10000)
 	
-	@staticmethod
-	def __get_rand_author() -> str:
+	def __get_rand_author(self) -> str:
 		l1, l2 = random.choice(string.ascii_letters), random.choice(string.ascii_letters)
-		word = RandomWord().word(include_categories=['noun'])
+		word = self.rw.word(include_categories=['noun'])
 		return f"{l1}. {l2}. {word}"
 	
 	def get_books(self) -> list[Book]:
-		books = [0]*self.amount
-		for i in range(self.amount):
-			books[i] = Book(
-				_title = self.__get_rand_title(),
-				_recorder_id = self.__get_rand_id(),
-				_author = self.__get_rand_author(),
-			)
-			books[i].set_source(self._name)
-		return books
+		return [
+			Book(
+				title = self.__get_rand_title(),
+				recorder_id = self.__get_rand_id(),
+				author = self.__get_rand_author()
+			).set_source(self._name)
+			for _ in range(self.amount)
+		]
 
 class Demo_source(Books_source):
 	def get_books(self) -> list[Book]:
 		books_list = [
 			Book(
-				_title="The War   of the Worlds",
-				_recorder_id=123,
-				_author="H.G. Wells",
-			),
+				title="The War   of the Worlds",
+				recorder_id=123,
+				author="H.G. Wells",
+			).set_source(self._name),
 			Book(
-				_title="Вишневый Сад",
-				_recorder_id=100,
-				_author="А.П. чехов",
-			),
+				title="Вишневый Сад",
+				recorder_id=100,
+				author="А.П. чехов",
+			).set_source(self._name),
 		]
-		for book in books_list:
-			book.set_source(self._name) 
 		return books_list

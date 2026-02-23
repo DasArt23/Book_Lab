@@ -7,7 +7,7 @@ def main():
         FileJSON_source("json_files/proba.json"),
         Demo_source(),
         Rand_source(amount=6),
-        #Rand_source(amount=8, title_len=14),
+        #Rand_source(amount=8),
         #FileJSON_source("json_files/good.json"),
     ]
     handler = Books_handler()
