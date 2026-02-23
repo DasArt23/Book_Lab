@@ -35,8 +35,11 @@ class FileJSON_source(Books_source):
 		if not self.__check_path():
 			return data
 		
-		with open(self.path, 'r', encoding='utf-8') as file:
-			sl = json.load(file)
+		try:
+			with open(self.path, 'r', encoding='utf-8') as file:
+				sl = json.load(file)
+		except:
+			return data
 			
 		for title in sl.keys():
 			book_js = sl[title]
