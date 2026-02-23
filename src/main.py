@@ -1,6 +1,6 @@
 from application import Application
 from data_processing.source import Demo_source, Rand_source, FileJSON_source
-from data_processing.engine import Books_handler
+from data_processing.engine import Text_handler
 
 def main():
     sources = [
@@ -10,7 +10,7 @@ def main():
         #Rand_source(amount=8),
         #FileJSON_source("json_files/good.json"),
     ]
-    handler = Books_handler()
+    handler = Text_handler()
     app = Application(sources, handler)
     app.run()
 

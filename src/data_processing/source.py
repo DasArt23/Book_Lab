@@ -65,6 +65,10 @@ class Rand_source(Books_source):
 	def __get_rand_id() -> int:
 		return random.randint(1000, 10000)
 	
+	@staticmethod
+	def __get_rand_year() -> int:
+		return random.randint(1600, 3000)
+	
 	def __get_rand_author(self) -> str:
 		l1, l2 = random.choice(string.ascii_letters), random.choice(string.ascii_letters)
 		word = self.rw.word(include_categories=['noun'])
@@ -75,7 +79,8 @@ class Rand_source(Books_source):
 			Book(
 				title = self.__get_rand_title(),
 				recorder_id = self.__get_rand_id(),
-				author = self.__get_rand_author()
+				author = self.__get_rand_author(),
+				year = self.__get_rand_year(),
 			).set_source(self._name)
 			for _ in range(self.amount)
 		]
@@ -87,11 +92,13 @@ class Demo_source(Books_source):
 				title="The War   of the Worlds",
 				recorder_id=123,
 				author="H.G. Wells",
+				year=1897,
 			).set_source(self._name),
 			Book(
 				title="Вишневый Сад",
 				recorder_id=100,
 				author="А.П. чехов",
+				year=1903,
 			).set_source(self._name),
 		]
 		return books_list

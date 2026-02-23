@@ -6,6 +6,7 @@ class Book:
 	title: str = ""
 	author: str = ""
 	favourite: bool = False
+	year: int = 2000
 	metadata: dict = field(default_factory=lambda: {
 		"source": "test",
 		"category": "Text",
@@ -19,3 +20,12 @@ class Book:
 		if source:
 			self.metadata['source'] = source
 		return self
+	
+	def __contains__(self, keyword):
+		return keyword.lower() in self.title.lower() or keyword.lower() in self.author.lower()
+	
+	def __eq__(self, book: 'Book'):
+		return self.title == book.title and self.author == book.author
+	
+	def __lt__(self, book: 'Book'):
+		return (self.year, self.title, self.author) < (book.year, book.title, book.author)
