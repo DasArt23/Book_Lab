@@ -1,9 +1,19 @@
 from domain.models import Book
+from abc import ABC, abstractmethod
 
-class Books_handler:
-	def __init__(self):
-		self.name = "Book Handler"
+
+class Books_handler(ABC):
+	name: str = "Handler"
+	@abstractmethod
+	def handler_books(self, books: list[Book]) -> list[Book]:
+		pass
 	
+	@abstractmethod	
+	def _handler_book(self, book: Book) -> Book:
+		pass
+
+class Text_handler(Books_handler):
+	name = "Books Handler"
 	def _handler_book(self, book: Book) -> Book:
 		"""Обработка объекта Book и возврат его копии"""
 		title = self.__clean_text(book.title, "Unknown Title")
@@ -15,6 +25,7 @@ class Books_handler:
 			"recorder_id": book.recorder_id,
 			"metadata": book.metadata.copy(),
 			"favourite": book.favourite,
+			"year": book.year,
 		}
 		
 		return self.__create_copy(data)
