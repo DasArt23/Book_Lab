@@ -6,6 +6,9 @@ requires-python = ">=3.13"
 name = "project-bakin-505"
 version = "0.1.0"
 source = { editable = "." }
+dependencies = [
+    { name = "wonderwords" },
+]
 
 [package.dev-dependencies]
 dev = [
@@ -13,6 +16,7 @@ dev = [
 ]
 
 [package.metadata]
+requires-dist = [{ name = "wonderwords", specifier = ">=3.0.1" }]
 
 [package.metadata.requires-dev]
 dev = [{ name = "ruff", specifier = ">=0.15.1" }]
@@ -40,4 +44,13 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/f6/58/ac864a75067dcbd3b95be5ab4eb2b601d7fbc3d3d736a27e391a4f92a5c1/ruff-0.15.1-py3-none-win32.whl", hash = "sha256:660975d9cb49b5d5278b12b03bb9951d554543a90b74ed5d366b20e2c57c2098", size = 10462555, upload-time = "2026-02-12T23:09:29.899Z" },
     { url = "https://files.pythonhosted.org/packages/e0/5e/d4ccc8a27ecdb78116feac4935dfc39d1304536f4296168f91ed3ec00cd2/ruff-0.15.1-py3-none-win_amd64.whl", hash = "sha256:c820fef9dd5d4172a6570e5721704a96c6679b80cf7be41659ed439653f62336", size = 11599956, upload-time = "2026-02-12T23:09:01.157Z" },
     { url = "https://files.pythonhosted.org/packages/2a/07/5bda6a85b220c64c65686bc85bd0bbb23b29c62b3a9f9433fa55f17cda93/ruff-0.15.1-py3-none-win_arm64.whl", hash = "sha256:5ff7d5f0f88567850f45081fac8f4ec212be8d0b963e385c3f7d0d2eb4899416", size = 10874604, upload-time = "2026-02-12T23:09:05.515Z" },
+]
+
+[[package]]
+name = "wonderwords"
+version = "3.0.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ff/23/e144fc3dfabb845dc1d94c45315d97b308cf75a664e3db3a89aeb1cb505d/wonderwords-3.0.1.tar.gz", hash = "sha256:5ee43ab6f13823a857a7c3d58c7b4db6a1350bd3aa5f914ed379ad49042a1c36", size = 73339, upload-time = "2025-10-30T17:30:44.231Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a4/75/855c2062d28b8e9247939f8262fb2f4ff3b12a49e4bab9fd1ba16cc5df82/wonderwords-3.0.1-py3-none-any.whl", hash = "sha256:4dd66deb6a76ca9e0b0422d1d3e111f9b910d7c16922d42de733ee8def98f8d0", size = 51658, upload-time = "2025-10-30T17:30:42.785Z" },
 ]
