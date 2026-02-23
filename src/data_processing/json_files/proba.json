@@ -1,0 +1,14 @@
+{
+	"Book1":{
+		"recorder_id": 1231451,
+		"author": "Jord Clone",
+		"favourite": 1
+	},
+	" python":{
+		"recorder_id": 8737
+	},
+	"Идиот":{
+		"recorder_id": 856395,
+		"author": "Федор Достоевский"
+	}
+}

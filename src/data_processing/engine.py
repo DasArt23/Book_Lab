@@ -5,17 +5,18 @@ class Books_handler:
 		self.name = "Book Handler"
 	
 	def _handler_book(self, book: Book) -> Book:
-		title = book.get_title()
+		title = book.title
 		title = self.__check_title(title)
 		
-		author = book.get_author()
+		author = book.author
 		author = self.__check_author(author)
 		
 		data = {
-			"title": title,
-			"author": author,
-			"recorder_id": book.get_rec_id(),
-			"metadata": book.get_metadata(),
+			"_title": title, 
+			"_author": author,
+			"_recorder_id": book.recorder_id,
+			"_metadata": book.metadata,
+			"_favourite": book.is_favourite(),
 		}
 		
 		hbook = self.__create_copy(data)
@@ -52,7 +53,7 @@ class Books_handler:
 		return new_author
 	
 	@staticmethod
-	def __create_copy(data) -> Book:
+	def __create_copy(data: dict) -> Book:
 		new_book = Book(**data)
 		return new_book
 			
