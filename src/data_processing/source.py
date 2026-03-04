@@ -31,16 +31,8 @@ class FileJSON_source(Books_source):
 		self.path = (Path(__file__).parent / path).resolve()
 	
 	def get_books(self) -> list[Book]:
-		data, sl = [], dict()
-		
-		if not self.path.is_file():
-			return []
-		
-		try:
-			with open(self.path, 'r', encoding='utf-8') as file:
-				sl = json.load(file)
-		except (json.JSONDecodeError, OSError):
-			return []
+		data = []
+		sl = self.get_data_from_file()
 			
 		for title in sl.keys():
 			book_js = sl[title]
@@ -48,6 +40,19 @@ class FileJSON_source(Books_source):
 			book = Book(**book_js).set_source(self._name)
 			data.append(book)
 		return data
+
+	def get_data_from_file(self) -> dict:
+		sl = {}
+		if not self.path.is_file():
+			return {}
+
+		try:
+			with open(self.path, 'r', encoding='utf-8') as file:
+				sl = json.load(file)
+		except (json.JSONDecodeError, OSError):
+			return {}
+		return sl
+
 
 class Rand_source(Books_source):
 	_name = "Random source"
