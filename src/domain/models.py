@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
+from functools import total_ordering
 
+@total_ordering
 @dataclass
 class Book:
 	recorder_id: int = 0
@@ -25,7 +27,7 @@ class Book:
 		return keyword.lower() in self.title.lower() or keyword.lower() in self.author.lower()
 	
 	def __eq__(self, book: 'Book'):
-		return self.title == book.title and self.author == book.author
+		return self.title == book.title and self.author == book.author and self.year == book.year
 	
 	def __lt__(self, book: 'Book'):
 		return (self.year, self.title, self.author) < (book.year, book.title, book.author)

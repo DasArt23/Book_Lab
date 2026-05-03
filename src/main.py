@@ -1,16 +1,17 @@
 from application import Application
-from data_processing.source import Demo_source, Rand_source, FileJSON_source
-from data_processing.engine import Text_handler
+from data_processing.fabrics import Sources_factory, Handler_factory
+from config import AppConfig
 
 def main():
-    sources = [
-        FileJSON_source("json_files/proba.json"),
-        Demo_source(),
-        Rand_source(amount=6),
-        #Rand_source(amount=8),
-        #FileJSON_source("json_files/good.json"),
-    ]
-    handler = Text_handler()
+    conf = AppConfig()
+
+    handler = Handler_factory.get_handler(
+        conf.handler_type,
+        **conf.handler_param,
+    )
+
+    sources = [Sources_factory.get_source(**source) for source in conf.sources_list]
+
     app = Application(sources, handler)
     app.run()
 

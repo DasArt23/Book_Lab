@@ -10,6 +10,9 @@ class Books_source(ABC):
 	"""Базовый интерфейс источника данных"""
 	_name = "Demo source"
 	_source_type = "demo"
+
+	def __init__(self, **kwargs):
+		pass
 	
 	@property
 	def source_type(self) -> str:
@@ -27,7 +30,7 @@ class FileJSON_source(Books_source):
 	_name = "JSON source"
 	_source_type = "json"
 	
-	def __init__(self, path: str = 'json_files/file.json'):
+	def __init__(self, path: str = 'json_files/file.json', **kwargs):
 		self.path = (Path(__file__).parent / path).resolve()
 	
 	def get_books(self) -> list[Book]:
@@ -58,23 +61,23 @@ class Rand_source(Books_source):
 	_name = "Random source"
 	_source_type = "generator"
 	
-	def __init__(self, amount: int = 1):
+	def __init__(self, amount: int = 1, **kwargs):
 		self.amount = max(amount, 1)
 		self.rw = RandomWord()
 		
-	def __get_rand_title(self) -> str:
+	def get_rand_title(self) -> str:
 		title = self.rw.word(include_categories=["adjective"]) + " " + self.rw.word(include_categories=['noun'])
 		return title
 	
 	@staticmethod
-	def __get_rand_id() -> int:
+	def get_rand_id() -> int:
 		return random.randint(1000, 10000)
 	
 	@staticmethod
-	def __get_rand_year() -> int:
+	def get_rand_year() -> int:
 		return random.randint(1600, 3000)
 	
-	def __get_rand_author(self) -> str:
+	def get_rand_author(self) -> str:
 		l1, l2 = random.choice(string.ascii_letters), random.choice(string.ascii_letters)
 		word = self.rw.word(include_categories=['noun'])
 		return f"{l1}. {l2}. {word}"
@@ -82,10 +85,10 @@ class Rand_source(Books_source):
 	def get_books(self) -> list[Book]:
 		return [
 			Book(
-				title = self.__get_rand_title(),
-				recorder_id = self.__get_rand_id(),
-				author = self.__get_rand_author(),
-				year = self.__get_rand_year(),
+				title = self.get_rand_title(),
+				recorder_id = self.get_rand_id(),
+				author = self.get_rand_author(),
+				year = self.get_rand_year(),
 			).set_source(self._name)
 			for _ in range(self.amount)
 		]
@@ -103,7 +106,7 @@ class Demo_source(Books_source):
 				title="Вишневый Сад",
 				recorder_id=100,
 				author="А.П. чехов",
-				year=1903,
+				year=20012,
 			).set_source(self._name),
 		]
 		return books_list
