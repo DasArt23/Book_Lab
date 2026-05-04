@@ -20,7 +20,12 @@ class AppConfig():
             {"source_type": "json", "path": "json_files/proba.json"},
             {"source_type": "demo"},
             {"source_type": "rand", "amount": 6},
+            {"source_type": "rand", "amount": 100000}
         ]
 
         self.app_version = "v1.5.1"
         self.debug = True
+
+    def get_sources(self):
+        """Получение данных для обработки"""
+        yield from self.sources_list

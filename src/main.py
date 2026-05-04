@@ -10,7 +10,10 @@ def main():
         **conf.handler_param,
     )
 
-    sources = [Sources_factory.get_source(**source) for source in conf.sources_list]
+    sources = (
+        Sources_factory.get_source(**src_conf)
+        for src_conf in conf.get_sources()
+    )
 
     app = Application(sources, handler)
     app.run()

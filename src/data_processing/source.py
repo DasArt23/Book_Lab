@@ -2,9 +2,10 @@ from domain.models import Book
 from abc import ABC, abstractmethod
 from wonderwords import RandomWord
 from pathlib import Path
+from typing import Generator
 import random
 import string
-import json
+import ijson
 
 class Books_source(ABC):
 	"""Базовый интерфейс источника данных"""
@@ -23,7 +24,7 @@ class Books_source(ABC):
 		return self._name
 	
 	@abstractmethod
-	def get_books(self) -> list[Book]:
+	def get_books(self) -> Generator[Book, None, None]:
 		pass
 
 class FileJSON_source(Books_source):
@@ -32,29 +33,19 @@ class FileJSON_source(Books_source):
 	
 	def __init__(self, path: str = 'json_files/file.json', **kwargs):
 		self.path = (Path(__file__).parent / path).resolve()
-	
-	def get_books(self) -> list[Book]:
-		data = []
-		sl = self.get_data_from_file()
-			
-		for title in sl.keys():
-			book_js = sl[title]
-			book_js['title'] = title
-			book = Book(**book_js).set_source(self._name)
-			data.append(book)
-		return data
 
-	def get_data_from_file(self) -> dict:
-		sl = {}
+	def get_books(self) -> Generator[Book, None, None]:
+		for title, book_js in self._get_items():
+			yield Book(title=title, **book_js).set_source(self._name)
+
+	def _get_items(self) -> Generator[tuple[str, dict], None, None]:
 		if not self.path.is_file():
-			return {}
-
+			return
 		try:
-			with open(self.path, 'r', encoding='utf-8') as file:
-				sl = json.load(file)
-		except (json.JSONDecodeError, OSError):
-			return {}
-		return sl
+			with open(self.path, 'rb') as file:
+				yield from ijson.kvitems(file, '')
+		except (ijson.common.IncompleteJSONError, OSError):
+			return
 
 
 class Rand_source(Books_source):
@@ -81,20 +72,18 @@ class Rand_source(Books_source):
 		l1, l2 = random.choice(string.ascii_letters), random.choice(string.ascii_letters)
 		word = self.rw.word(include_categories=['noun'])
 		return f"{l1}. {l2}. {word}"
-	
-	def get_books(self) -> list[Book]:
-		return [
-			Book(
-				title = self.get_rand_title(),
-				recorder_id = self.get_rand_id(),
-				author = self.get_rand_author(),
-				year = self.get_rand_year(),
-			).set_source(self._name)
-			for _ in range(self.amount)
-		]
+
+	def get_books(self) -> Generator[Book, None, None]:
+		for _ in range(self.amount):
+			yield Book(
+					title = self.get_rand_title(),
+					recorder_id = self.get_rand_id(),
+					author = self.get_rand_author(),
+					year = self.get_rand_year(),
+				).set_source(self._name)
 
 class Demo_source(Books_source):
-	def get_books(self) -> list[Book]:
+	def get_books(self) -> Generator[Book, None, None]:
 		books_list = [
 			Book(
 				title="The War   of the Worlds",
@@ -109,4 +98,4 @@ class Demo_source(Books_source):
 				year=20012,
 			).set_source(self._name),
 		]
-		return books_list
+		yield from (book for book in books_list)

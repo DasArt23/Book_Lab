@@ -2,6 +2,9 @@ from domain.models import Book
 from abc import ABC, abstractmethod
 from dataclasses import replace
 from datetime import datetime
+from collections.abc import Iterable
+from typing import Generator
+
 
 class Books_handler(ABC):
 	name: str = "Handler"
@@ -10,8 +13,10 @@ class Books_handler(ABC):
 	def handler_book(self, book: Book) -> Book:
 		pass
 
-	def handler_books(self, books: list[Book]) -> list[Book]:
-		return [self.handler_book(book) for book in books]
+	def handler_books(self, books: Iterable[Book]) -> Generator[tuple[Book, Book], None, None]:
+		"""Возвращает генератор с кортежами (old_book, new_book)"""
+		for book in books:
+			yield book, self.handler_book(book)
 
 	@staticmethod
 	def create_copy(book: Book, **kwargs) -> Book:

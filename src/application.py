@@ -2,9 +2,11 @@ from data_processing.engine import Books_handler
 from data_processing.source import Books_source
 from domain.models import Book
 from collections import defaultdict
+from collections.abc import Iterable
+
 
 class Application:
-	def __init__(self, sources: list[Books_source], handler: Books_handler):
+	def __init__(self, sources: Iterable[Books_source], handler: Books_handler):
 		self.sources = sources
 		self.data_handler = handler
 		self.statistics = StatisticTracker()
@@ -21,25 +23,23 @@ class Application:
 		raw_data = source.get_books()
 
 		if not raw_data:
-			print("Данные не получены")
+			print(f"Данные не получены")
 			return
 
-		self.statistics.add_received(source.name, len(raw_data))
-		print(f"Получено данных: {len(raw_data)}")
+		processed_books = self.data_handler.handler_books(raw_data)
+		self.print_all_changes(processed_books, source.name)
 
-		proccesed_data = self.data_handler.handler_books(raw_data)
-		self.print_changes(raw_data, proccesed_data, source.name)
+	def print_all_changes(self, proc_data: Iterable[tuple[Book, Book]], source_name: str) -> None:
+		for old, proc in proc_data:
+			self.print_changes(old, proc, source_name)
 	
-	def print_changes(self, data1: list[Book], data2: list[Book], source_name: str) -> None:
+	def print_changes(self, old_book: Book, proc_book: Book, source_name: str) -> None:
 		"""Сравнение атрибутов двух объектов Book"""
-		c = 0
-		for book1, book2 in zip(data1, data2):
-			if book1 != book2:
-				print("\nИзменения:")
-				self.print_what_changed(book1, book2)
-				c += 1
-		self.statistics.add_modified(source_name, c)
-		print(f"Количество изменений: {c}")
+		self.statistics.add_received(source_name, 1)
+		if old_book != proc_book:
+			print("\nИзменения:")
+			self.print_what_changed(old_book, proc_book)
+			self.statistics.add_modified(source_name, 1)
 
 	@staticmethod
 	def print_what_changed(book1: Book, book2: Book) -> None:
