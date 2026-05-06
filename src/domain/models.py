@@ -9,6 +9,7 @@ class Book:
 	author: str = ""
 	favourite: bool = False
 	year: int = 2000
+	url: str = ""
 	metadata: dict = field(default_factory=lambda: {
 		"source": "test",
 		"category": "Text",

@@ -34,3 +34,5 @@ class Handler_factory:
             raise ValueError(f"Неизвестный тип обработчика: {handler_type}")
 
         return handler(**kwargs)
+
+

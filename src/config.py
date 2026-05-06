@@ -1,3 +1,4 @@
+from data_processing.parser import Demo_parser, Parser
 
 class AppConfig():
     _instance = None
@@ -10,7 +11,7 @@ class AppConfig():
 
     def _set_up(self):
         """Хранение данных программы"""
-        self.handler_type = "year"
+        self.handler_type = "text"
         self.handler_param = {
             "rec_id": 505,
             "treshold": 3,
@@ -20,12 +21,28 @@ class AppConfig():
             {"source_type": "json", "path": "json_files/proba.json"},
             {"source_type": "demo"},
             {"source_type": "rand", "amount": 6},
-            {"source_type": "rand", "amount": 100000}
+            #{"source_type": "rand", "amount": 100000}
+        ]
+
+        self.parsers = [
+            Demo_parser("json_files/demo1.json"),
+            Demo_parser("json_files/demo2.json", genre="fiction_10"),
+            Demo_parser("json_files/demo3.json", page="page-3")
         ]
 
         self.app_version = "v1.5.1"
         self.debug = True
 
+    def get_data_from_parsing(self) -> None:
+        """Получает данные из парсеров и создает источника для обработки"""
+        for parser in self.parsers:
+            parser.parse_books()
+            self.sources_list.append({
+                "source_type": parser.file_type,
+                "path": parser.filename,
+            })
+
     def get_sources(self):
         """Получение данных для обработки"""
+        self.get_data_from_parsing()
         yield from self.sources_list
