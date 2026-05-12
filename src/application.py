@@ -3,6 +3,10 @@ from data_processing.source import Books_source
 from domain.models import Book
 from collections import defaultdict
 from collections.abc import Iterable
+from config import AppConfig
+from core.mode_manager import ModeManager
+from core.timer import ProcessTimer
+from domain.work_unit import BookWorkUnit
 
 
 class Application:
@@ -10,28 +14,42 @@ class Application:
 		self.sources = sources
 		self.data_handler = handler
 		self.statistics = StatisticTracker()
+		self.config = AppConfig()
+		self.mode_manager = ModeManager(
+			mode=self.config.execution_mode,
+			max_workers=self.config.max_workers,
+		)
+		self.work_unit = BookWorkUnit(self.data_handler)
 	
 	def run(self) -> None:
-		"""Основной цикл программы"""
-		for source in self.sources:
-			self.process_source(source)
+		print(f"Запуск в режиме: {self.config.execution_mode.value}")
 
+		with ProcessTimer() as timer:
+			self._process_sources_concurrent()
+
+		dtime = timer.get_time()
 		self.statistics.display()
+		print(f"Время выполнения: {dtime:.3f} секунд")
 		print("Программа завершилась успешно")
 
-	def process_source(self, source: Books_source) -> None:
-		raw_data = source.get_books()
+	def _process_sources_concurrent(self) -> None:
+		for source in self.sources:
+			for original, processed in self.mode_manager.execute(self.work_unit, source.get_books()):
+				self.print_changes(original, processed, source.name)
 
-		if not raw_data:
-			print(f"Данные не получены")
-			return
-
-		processed_books = self.data_handler.handler_books(raw_data)
-		self.print_all_changes(processed_books, source.name)
-
-	def print_all_changes(self, proc_data: Iterable[tuple[Book, Book]], source_name: str) -> None:
-		for old, proc in proc_data:
-			self.print_changes(old, proc, source_name)
+	# def process_source(self, source: Books_source) -> None:
+	# 	raw_data = source.get_books()
+ #
+	# 	if not raw_data:
+	# 		print(f"Данные не получены")
+	# 		return
+ #
+	# 	processed_books = self.data_handler.handler_books(raw_data)
+	# 	self.print_all_changes(processed_books, source.name)
+ #
+	# def print_all_changes(self, proc_data: Iterable[tuple[Book, Book]], source_name: str) -> None:
+	# 	for old, proc in proc_data:
+	# 		self.print_changes(old, proc, source_name)
 	
 	def print_changes(self, old_book: Book, proc_book: Book, source_name: str) -> None:
 		"""Сравнение атрибутов двух объектов Book"""

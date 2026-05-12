@@ -10,6 +10,9 @@ class Parser(ABC):
     _name = "parser"
     _file_type = "json"
 
+    def __init__(self, file_path: str, **params):
+        self.file_path = (Path(__file__).parent / file_path).resolve()
+
     @property
     @abstractmethod
     def filename(self):
@@ -26,6 +29,8 @@ class Parser(ABC):
     def save_results(self, data) -> None:
         with open(self.file_path, "w", encoding="utf-8") as file:
             json.dump(data, file, ensure_ascii=False, indent=4)
+        print(f"Данные сохранены по пути: {self.file_path}")
+
 
     def get_page(self) -> str:
         ua = UserAgent()

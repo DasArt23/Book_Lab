@@ -1,7 +1,6 @@
 from application import Application
 from data_processing.fabrics import Sources_factory, Handler_factory
 from config import AppConfig
-from data_processing.parser import Demo_parser
 
 def main():
     conf = AppConfig()

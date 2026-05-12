@@ -1,4 +1,13 @@
+from enum import Enum
 from data_processing.parser import Demo_parser, Parser
+
+import argparse
+
+class ExecutionMode(Enum):
+    """Режимы выполнения обработки"""
+    SEQUENTIAL = "sequential"
+    THREAD = "thread"
+    PROCESS = "process"
 
 class AppConfig():
     _instance = None
@@ -21,7 +30,7 @@ class AppConfig():
             {"source_type": "json", "path": "json_files/proba.json"},
             {"source_type": "demo"},
             {"source_type": "rand", "amount": 6},
-            #{"source_type": "rand", "amount": 100000}
+            {"source_type": "rand", "amount": 1000},
         ]
 
         self.parsers = [
@@ -32,6 +41,11 @@ class AppConfig():
 
         self.app_version = "v1.5.1"
         self.debug = True
+
+        self.execution_mode = ExecutionMode.SEQUENTIAL
+        self._max_workers = 4
+
+        self._parse_arguments()
 
     def get_data_from_parsing(self) -> None:
         """Получает данные из парсеров и создает источника для обработки"""
@@ -46,3 +60,41 @@ class AppConfig():
         """Получение данных для обработки"""
         self.get_data_from_parsing()
         yield from self.sources_list
+
+    def _parse_arguments(self):
+        parser = argparse.ArgumentParser(
+            description=f"Приложение для обработки данных v{self.app_version}",
+            formatter_class=argparse.RawTextHelpFormatter
+        )
+
+        parser.add_argument(
+            "-m", "--mode",
+            type=str,
+            choices=[mode.value for mode in ExecutionMode],
+            default=self.execution_mode.value,
+            help=f"""Режим выполнения обработки:
+            sequential - последовательный режим (по умолчанию)
+            thread     - многопоточный режим
+            process    - многопроцессный режим"""
+        )
+
+        parser.add_argument(
+            "-w", "--workers",
+            type=int,
+            default=self.max_workers,
+            help=f"Количество потоков/процессов (по умолчанию: {self.max_workers})"
+        )
+
+        args = parser.parse_args()
+
+        self.workers = args.workers
+        self.execution_mode = ExecutionMode(args.mode)
+
+    @property
+    def max_workers(self):
+        return self._max_workers
+
+    @max_workers.setter
+    def max_workers(self, value):
+        if value >= 2:
+            self._max_workers = value
