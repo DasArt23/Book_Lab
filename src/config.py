@@ -20,7 +20,7 @@ class AppConfig():
 
     def _set_up(self):
         """Хранение данных программы"""
-        self.handler_type = "text"
+        self.handler_type = "year"
         self.handler_param = {
             "rec_id": 505,
             "treshold": 3,
@@ -30,7 +30,7 @@ class AppConfig():
             {"source_type": "json", "path": "json_files/proba.json"},
             {"source_type": "demo"},
             {"source_type": "rand", "amount": 6},
-            {"source_type": "rand", "amount": 1000},
+            #{"source_type": "rand", "amount": 1000},
         ]
 
         self.parsers = [

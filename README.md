@@ -12,6 +12,7 @@
 
 ## Использование
 Программа запускается при запуске команды **make project**
+Можно указать параметры MODE и W
 
 ## Вывод программы после запуска проекта
 ```
@@ -50,6 +51,7 @@
 Получено из источника Random source: 6
 Изменено данных источника Random source: 3
 
+Время выполнения: 6.228 секунд
 Программа завершилась успешно
 ```
 Можно добавить различные источники данных или изменить обработчик, модифицируя класс **AppConfig**.
@@ -81,27 +83,41 @@ project_Bakin_505
 ├── src
 │   ├── application.py
 │   ├── config.py
+│   ├── core
+│   │   ├── mode_manager.py
+│   │   └── timer.py
 │   ├── data_processing
 │   │   ├── engine.py
 │   │   ├── fabrics.py
 │   │   ├── json_files
+│   │   │   ├── demo1.json
+│   │   │   ├── demo2.json
+│   │   │   ├── demo3.json
 │   │   │   ├── good.json
 │   │   │   └── proba.json
+│   │   ├── parser.py
 │   │   └── source.py
 │   ├── domain
 │   │   ├── constants.py
-│   │   └── models.py
+│   │   ├── models.py
+│   │   └── work_unit.py
 │   └── main.py
 └── uv.lock
 ```
 ### Makefile
 ```
+MODE ?= sequential
+W ?= 4
+
 install:
-		uv sync
+	uv sync
 build:
-		uv build
+	uv build
 project:
-		uv run start
+	uv run start -m $(MODE) -w $(W)
 lint:
-		uv tool run ruff check
+	uv tool run ruff check
 ```
+Где при запуске можно назначить: 
+- MODE = sequential,thread,process для выбора режима обработки
+- W = количество потоков
