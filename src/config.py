@@ -1,6 +1,6 @@
 from enum import Enum
 from data_processing.parser import Demo_parser, Parser
-
+import asyncio
 import argparse
 
 class ExecutionMode(Enum):
@@ -8,6 +8,7 @@ class ExecutionMode(Enum):
     SEQUENTIAL = "sequential"
     THREAD = "thread"
     PROCESS = "process"
+    ASYNC = "async"
 
 class AppConfig():
     _instance = None
@@ -20,7 +21,7 @@ class AppConfig():
 
     def _set_up(self):
         """Хранение данных программы"""
-        self.handler_type = "year"
+        self.handler_type = "text"
         self.handler_param = {
             "rec_id": 505,
             "treshold": 3,
@@ -48,7 +49,7 @@ class AppConfig():
         self._parse_arguments()
 
     def get_data_from_parsing(self) -> None:
-        """Получает данные из парсеров и создает источника для обработки"""
+        """Получает данные из парсеров и создает источника для обработки последовательно"""
         for parser in self.parsers:
             parser.parse_books()
             self.sources_list.append({
@@ -75,7 +76,8 @@ class AppConfig():
             help=f"""Режим выполнения обработки:
             sequential - последовательный режим (по умолчанию)
             thread     - многопоточный режим
-            process    - многопроцессный режим"""
+            process    - многопроцессный режим
+            async      - асинхронный режим"""
         )
 
         parser.add_argument(
@@ -98,3 +100,8 @@ class AppConfig():
     def max_workers(self, value):
         if value >= 2:
             self._max_workers = value
+
+    @property
+    def is_async_mode(self) -> bool:
+        """Проверка, запущен ли асинхронный режим"""
+        return self.execution_mode == ExecutionMode.ASYNC

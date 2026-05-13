@@ -2,10 +2,11 @@ from domain.models import Book
 from abc import ABC, abstractmethod
 from wonderwords import RandomWord
 from pathlib import Path
-from typing import Generator
+from typing import Generator, AsyncGenerator
 import random
 import string
 import ijson
+import asyncio
 
 class Books_source(ABC):
 	"""Базовый интерфейс источника данных"""
@@ -26,6 +27,12 @@ class Books_source(ABC):
 	@abstractmethod
 	def get_books(self) -> Generator[Book, None, None]:
 		pass
+
+	async def get_books_async(self) -> AsyncGenerator[Book, None]:
+		for book in self.get_books():
+			await asyncio.sleep(0.01)
+			yield book
+
 
 class FileJSON_source(Books_source):
 	_name = "JSON source"
