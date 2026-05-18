@@ -9,6 +9,7 @@ from core.timer import ProcessTimer
 from domain.work_unit import BookWorkUnit
 import asyncio
 
+
 class Application:
 	def __init__(self, sources: Iterable[Books_source], handler: Books_handler):
 		self.sources = sources
@@ -63,14 +64,11 @@ class Application:
 
 	# def process_source(self, source: Books_source) -> None:
 	# 	raw_data = source.get_books()
- #
 	# 	if not raw_data:
 	# 		print(f"Данные не получены")
 	# 		return
- #
 	# 	processed_books = self.data_handler.handler_books(raw_data)
 	# 	self.print_all_changes(processed_books, source.name)
- #
 	# def print_all_changes(self, proc_data: Iterable[tuple[Book, Book]], source_name: str) -> None:
 	# 	for old, proc in proc_data:
 	# 		self.print_changes(old, proc, source_name)
@@ -101,6 +99,7 @@ class Application:
 				val2 = getattr(book2, attr)
 				if val1 != val2:
 					print(f"  {attr.title()}: {val1} -> {val2}")
+
 
 class StatisticTracker():
 	def __init__(self):

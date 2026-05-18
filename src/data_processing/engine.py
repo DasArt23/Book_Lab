@@ -23,6 +23,7 @@ class Books_handler(ABC):
 		kwargs["metadata"] = book.metadata.copy() if "metadata" not in kwargs else kwargs["metadata"].copy()
 		return replace(book, **kwargs)
 
+
 class Text_handler(Books_handler):
 	name = "Books Text Handler"
 
@@ -42,6 +43,7 @@ class Text_handler(Books_handler):
 		if not text or not text.strip():
 			return default
 		return " ".join(text.strip().split()).title()
+
 
 class Year_handler(Books_handler):
 	name = "Books Year Handler"
@@ -63,6 +65,7 @@ class Year_handler(Books_handler):
 	@staticmethod
 	def get_cur_year() -> int:
 		return datetime.now().year
+
 
 class ID_handler(Books_handler):
 	name = "Books RecorderID Handler"

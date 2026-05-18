@@ -1,6 +1,7 @@
 from .engine import Books_handler, ID_handler, Year_handler, Text_handler
 from .source import Books_source, Rand_source, Demo_source, FileJSON_source
 
+
 class Sources_factory:
     _sources = {
         "rand": Rand_source,
@@ -17,6 +18,7 @@ class Sources_factory:
             raise ValueError(f"Неизвестный тип источник: {source_type}")
 
         return source(**kwargs)
+
 
 class Handler_factory:
     _handlers = {

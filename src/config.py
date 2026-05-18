@@ -3,12 +3,14 @@ from data_processing.parser import Demo_parser, Parser
 import asyncio
 import argparse
 
+
 class ExecutionMode(Enum):
     """Режимы выполнения обработки"""
     SEQUENTIAL = "sequential"
     THREAD = "thread"
     PROCESS = "process"
     ASYNC = "async"
+
 
 class AppConfig():
     _instance = None
@@ -73,7 +75,8 @@ class AppConfig():
             type=str,
             choices=[mode.value for mode in ExecutionMode],
             default=self.execution_mode.value,
-            help=f"""Режим выполнения обработки:
+            help=f"""
+            Режим выполнения обработки:
             sequential - последовательный режим (по умолчанию)
             thread     - многопоточный режим
             process    - многопроцессный режим
