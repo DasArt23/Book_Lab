@@ -32,7 +32,14 @@ class AppConfig():
             {"source_type": "json", "path": "json_files/proba.json"},
             {"source_type": "demo"},
             {"source_type": "rand", "amount": 6},
-            {"source_type": "rand", "amount": 1000},
+            #{"source_type": "rand", "amount": 1000},
+            {"source_type": "parse", "urls": [
+                "https://books.toscrape.com/catalogue/category/books_1/index.html",
+                "https://books.toscrape.com/catalogue/category/books/sequential-art_5/page-2.html",
+            ]},
+            {"source_type": "parse", "urls": [
+                "https://books.toscrape.com/catalogue/category/books_1/index.html",
+            ]}
         ]
 
         self.parsers = [
@@ -49,6 +56,13 @@ class AppConfig():
 
         self._parse_arguments()
 
+        self.max_concurrent_requests = 3
+        self.request_delay = 1.0
+        self.retry_count = 3
+        self.retry_backoff_factor = 2.0
+        self.request_timeout = 10.0
+        self.rate_limit_cooldown = 60.0
+
     def get_data_from_parsing(self) -> None:
         """
             Получает данные из парсеров и создает источника
@@ -63,7 +77,6 @@ class AppConfig():
 
     def get_sources(self):
         """Получение данных для обработки"""
-        self.get_data_from_parsing()
         yield from self.sources_list
 
     def _parse_arguments(self):

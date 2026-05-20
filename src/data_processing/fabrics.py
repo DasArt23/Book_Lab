@@ -1,5 +1,5 @@
 from .engine import Books_handler, ID_handler, Year_handler, Text_handler
-from .source import Books_source, Rand_source, Demo_source, FileJSON_source
+from .source import Books_source, Rand_source, Demo_source, FileJSON_source, Parse_source
 
 
 class Sources_factory:
@@ -7,6 +7,7 @@ class Sources_factory:
         "rand": Rand_source,
         "json": FileJSON_source,
         "demo": Demo_source,
+        "parse": Parse_source,
     }
 
     @classmethod

@@ -1,10 +1,10 @@
 from bs4 import BeautifulSoup, PageElement
 from abc import ABC, abstractmethod
-from domain.models import Book
 from fake_useragent import UserAgent
 from pathlib import Path
 import json
 import requests
+
 
 class Parser(ABC):
     _name = "parser"
@@ -30,7 +30,6 @@ class Parser(ABC):
         with open(self.file_path, "w", encoding="utf-8") as file:
             json.dump(data, file, ensure_ascii=False, indent=4)
         print(f"Данные сохранены по пути: {self.file_path}")
-
 
     def get_page(self) -> str:
         ua = UserAgent()
