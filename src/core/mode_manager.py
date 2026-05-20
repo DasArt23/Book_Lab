@@ -57,3 +57,13 @@ class ModeManager:
             futures = [executor.submit(task_func, item, *args, **kwargs) for item in items]
             for future in futures:
                 yield future.result()
+
+    async def execute_hybrid(self, task_func: Callable, items: List[Any], *args, **kwargs) -> AsyncGenerator:
+        from core.task_manager import TaskManager
+        tm = TaskManager(mode=self.mode, max_workers=self.max_workers)
+        tm.start()
+        try:
+            async for result in tm.process_batch(task_func, items, *args, **kwargs):
+                yield result
+        finally:
+            tm.shutdown()

@@ -20,7 +20,7 @@ class BookWorkUnit:
 
     async def __call_async__(self, book: Book) -> Tuple[Book, Book]:
         """Асинхронный вызов"""
-        await asyncio.sleep(0.01)  # имитация I/O
+        await asyncio.sleep(0.1)  # имитация I/O
         try:
             processed_book = self.handler.handler_book(book)
             return book, processed_book
@@ -30,4 +30,3 @@ class BookWorkUnit:
     def __reduce__(self):
         """Для корректной сериализации данных"""
         return (self.__class__, (self.handler,))
-

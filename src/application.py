@@ -44,6 +44,35 @@ class Application:
 		print(f"Время выполнения: {dtime:.3f} секунд")
 		print("Программа завершилась успешно")
 
+	async def run_hybrid(self) -> None:
+		"""Гибридный запуск (async + executor)"""
+		print(f"Запуск в режиме: {self.config.execution_mode.value}")
+
+		with ProcessTimer() as timer:
+			await self._process_sources_hybrid()
+
+		dtime = timer.get_time()
+		self.statistics.display()
+		print(f"Время выполнения: {dtime:.3f} секунд")
+		print("Программа завершилась успешно")
+
+	async def _process_sources_hybrid(self) -> None:
+		"""Гибридная обработка источников"""
+		tasks = [self._process_source_hybrid(source) for source in self.sources]
+		await asyncio.gather(*tasks)
+
+	async def _process_source_hybrid(self, source: Books_source) -> None:
+		"""Гибридная обработка одного источника"""
+		books = []
+		async for book in source.get_books_async():
+			books.append(book)
+
+		async for original, processed in self.mode_manager.execute_hybrid(self.work_unit, books):
+			await self._print_changes_async(original, processed, source.name)
+			self.statistics.add_received(source.name, 1)
+			if original != processed:
+				self.statistics.add_modified(source.name, 1)
+
 	def _process_sources_concurrent(self) -> None:
 		for source in self.sources:
 			for original, processed in self.mode_manager.execute(self.work_unit, source.get_books()):
@@ -72,7 +101,7 @@ class Application:
 	# def print_all_changes(self, proc_data: Iterable[tuple[Book, Book]], source_name: str) -> None:
 	# 	for old, proc in proc_data:
 	# 		self.print_changes(old, proc, source_name)
-	
+
 	def print_changes(self, old_book: Book, proc_book: Book, source_name: str) -> None:
 		"""Сравнение атрибутов двух объектов Book"""
 		self.statistics.add_received(source_name, 1)

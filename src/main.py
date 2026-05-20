@@ -1,7 +1,8 @@
 from application import Application
 from data_processing.fabrics import Sources_factory, Handler_factory
-from config import AppConfig
+from config import AppConfig, ExecutionMode
 import asyncio
+
 
 def main():
     conf = AppConfig()
@@ -17,11 +18,13 @@ def main():
     )
 
     app = Application(sources, handler)
-
     if conf.is_async_mode:
         asyncio.run(app.run_async())
+    elif conf.execution_mode in [ExecutionMode.THREAD, ExecutionMode.PROCESS]:
+        asyncio.run(app.run_hybrid())
     else:
         app.run()
+
 
 if __name__ == "__main__":
     main()

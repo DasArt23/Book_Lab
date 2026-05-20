@@ -1,6 +1,5 @@
 from enum import Enum
-from data_processing.parser import Demo_parser, Parser
-import asyncio
+from data_processing.parser import Demo_parser
 import argparse
 
 
@@ -33,7 +32,7 @@ class AppConfig():
             {"source_type": "json", "path": "json_files/proba.json"},
             {"source_type": "demo"},
             {"source_type": "rand", "amount": 6},
-            #{"source_type": "rand", "amount": 1000},
+            {"source_type": "rand", "amount": 1000},
         ]
 
         self.parsers = [
@@ -51,7 +50,10 @@ class AppConfig():
         self._parse_arguments()
 
     def get_data_from_parsing(self) -> None:
-        """Получает данные из парсеров и создает источника для обработки последовательно"""
+        """
+            Получает данные из парсеров и создает источника
+            для обработки последовательно
+        """
         for parser in self.parsers:
             parser.parse_books()
             self.sources_list.append({
@@ -75,19 +77,20 @@ class AppConfig():
             type=str,
             choices=[mode.value for mode in ExecutionMode],
             default=self.execution_mode.value,
-            help=f"""
-            Режим выполнения обработки:
+            help=f"""Режим выполнения обработки:
             sequential - последовательный режим (по умолчанию)
             thread     - многопоточный режим
             process    - многопроцессный режим
-            async      - асинхронный режим"""
+            async      - асинхронный режим
+            """
         )
 
         parser.add_argument(
             "-w", "--workers",
             type=int,
             default=self.max_workers,
-            help=f"Количество потоков/процессов (по умолчанию: {self.max_workers})"
+            help=f"Количество потоков/процессов"\
+                  "(по умолчанию: {self.max_workers})"
         )
 
         args = parser.parse_args()

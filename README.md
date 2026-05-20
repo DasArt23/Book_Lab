@@ -119,5 +119,5 @@ lint:
 	uv tool run ruff check
 ```
 Где при запуске можно назначить: 
-- MODE = sequential,thread,process для выбора режима обработки
+- MODE = sequential,thread,process,async для выбора режима обработки
 - W = количество потоков
