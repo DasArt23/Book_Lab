@@ -1,14 +1,10 @@
 from aiogram import Bot, Dispatcher
-from aiogram.client.session.aiohttp import AiohttpSession
 from domain.constants import TOKEN
 import telegram.handlers.commands as commands
 
 
 async def run_bot():
-    print("Запуск бота пошел")
-    session = AiohttpSession(proxy='http://195.201.141.139:80')
-
-    bot = Bot(token=TOKEN, session=session)
+    bot = Bot(token=TOKEN)
     dp = Dispatcher()
     dp.include_routers(commands.router)
 
