@@ -1,18 +1,30 @@
 from application import Application
-from data_processing.source import Demo_source, Rand_source, FileJSON_source
-from data_processing.engine import Text_handler
+from data_processing.fabrics import Sources_factory, Handler_factory
+from config import AppConfig, ExecutionMode
+import asyncio
+
 
 def main():
-    sources = [
-        FileJSON_source("json_files/proba.json"),
-        Demo_source(),
-        Rand_source(amount=6),
-        #Rand_source(amount=8),
-        #FileJSON_source("json_files/good.json"),
-    ]
-    handler = Text_handler()
+    conf = AppConfig()
+
+    handler = Handler_factory.get_handler(
+        conf.handler_type,
+        **conf.handler_param,
+    )
+
+    sources = (
+        Sources_factory.get_source(**src_conf)
+        for src_conf in conf.get_sources()
+    )
+
     app = Application(sources, handler)
-    app.run()
+    if conf.is_async_mode:
+        asyncio.run(app.run_async())
+    elif conf.execution_mode in [ExecutionMode.THREAD, ExecutionMode.PROCESS]:
+        asyncio.run(app.run_hybrid())
+    else:
+        app.run()
+
 
 if __name__ == "__main__":
     main()
