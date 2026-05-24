@@ -9,7 +9,7 @@ class ExecutionMode(Enum):
     THREAD = "thread"
     PROCESS = "process"
     ASYNC = "async"
-
+    TELEG = "teleg"
 
 class AppConfig():
     _instance = None
