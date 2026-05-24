@@ -9,3 +9,5 @@ project:
 	uv run start -m $(MODE) -w $(W)
 lint:
 	uv tool run ruff check
+teleg:
+	uv run start -m teleg
