@@ -2,6 +2,7 @@ from application import Application
 from data_processing.fabrics import Sources_factory, Handler_factory
 from config import AppConfig, ExecutionMode
 import asyncio
+import telegram.bot
 
 
 def main():
@@ -22,6 +23,8 @@ def main():
         asyncio.run(app.run_async())
     elif conf.execution_mode in [ExecutionMode.THREAD, ExecutionMode.PROCESS]:
         asyncio.run(app.run_hybrid())
+    elif conf.execution_mode == ExecutionMode.TELEG:
+        asyncio.run(telegram.bot.run_bot())
     else:
         app.run()
 
