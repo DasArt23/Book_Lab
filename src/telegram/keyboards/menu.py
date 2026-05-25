@@ -5,7 +5,7 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 def get_start_menu():
     buttons = [
-            KeyboardButton(text="Получить книги"),
+            [KeyboardButton(text="Получить книги")],
     ]
     return ReplyKeyboardMarkup(
         keyboard=buttons,
@@ -20,7 +20,7 @@ def add_sources():
     for source_name in names:
         builder.add(KeyboardButton(text=source_name))
     builder.adjust(2)
-    builder.add(KeyboardButton(text="Хватит"))
-    builder.add(KeyboardButton(text="Очистить"))
-    builder.add(KeyboardButton(text="Просмотреть"))
+    builder.row(KeyboardButton(text="Хватит"))
+    builder.row(KeyboardButton(text="Очистить"))
+    builder.row(KeyboardButton(text="Просмотреть"))
     return builder.as_markup(resize_keyboard=True)
