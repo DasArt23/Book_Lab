@@ -12,45 +12,50 @@ import os
 router = Router()
 
 
-@router.message(EnterNum.ch_num, F.text.strip().isdigit())
-async def set_num(message: Message, state: FSMContext):
-    num = await state.get_data()
-    AppConfig().add_source({"source_type": "rand", "amount": max(num, 1)})
-    await message.answer(
-        "Хотите добавить еще источник?",
-        reply_markup=add_sources(),
-    )
+@router.message(StateFilter(EnterNum.ch_num))
+async def handle_rand_amount(message: Message, state: FSMContext):
+    text = message.text.strip()
 
+    if text.isdigit():
+        amount = int(text)
+        AppConfig().add_source({"source_type": "rand", "amount": max(amount, 1)})
+        await message.answer(
+            f"✅ Добавлен источник с {amount} книгами.\nХотите добавить еще?",
+            reply_markup=add_sources(),
+        )
+    else:
+        AppConfig().add_source({"source_type": "rand", "amount": 6})
+        await message.answer(
+            "❌ Это не число. Добавлен источник с 6 книгами.\nХотите добавить еще?",
+            reply_markup=add_sources(),
+        )
 
-@router.message(EnterNum.ch_num, F.text)
-async def not_num(message: Message, state: FSMContext):
-    AppConfig().add_source({"source_type": "rand", "amount": 6})
-    await message.answer(
-        "Это не число.\nХотите добавить еще источник?",
-        reply_markup=add_sources(),
-    )
+    await state.clear()
+
 
 
 @router.message(EnterPath.ch_path, F.text.strip().endswith('.json'))
 async def set_path(message: Message, state: FSMContext):
     clean_path = message.text.strip()
     AppConfig().add_source({"source_type": "json", "path": clean_path})
-    await state.update_data(json_path=clean_path)
     await message.answer(
         "Хотите добавить еще источник?",
         reply_markup=add_sources(),
     )
+    await state.clear()
+
 
 
 @router.message(EnterPath.ch_path, F.text)
 async def not_path(message: Message, state: FSMContext):
     DEFAULT_PATH = "json_files/proba.json"
     AppConfig().add_source({"source_type": "json", "path": "json_files/proba.json"})
-    await state.update_data(json_path=DEFAULT_PATH)
     await message.answer(
         "Это не путь к json файлу.\nХотите добавить еще источник?",
         reply_markup=add_sources(),
     )
+    await state.clear()
+
 
 
 @router.message(F.text.lower() == "получить книги")
@@ -135,6 +140,7 @@ async def view_config(message: Message):
 
     await message.answer("📋 Источники:\n" + "\n".join(lines))
 
+
 @router.message(StateFilter(None), F.text.lower() == "очистить")
 async def clear_config(message: Message):
     AppConfig().clear_sources()
@@ -196,16 +202,6 @@ async def set_threshold(message: Message, state: FSMContext):
     AppConfig().set_handler(handler_type=data["h_type"], rec_id=505, threshold=threshold_val)
     await message.answer(text="Выберите режим запуска программы:", reply_markup=get_modes_menu())
     await state.set_state(EnterHandler.ch_mode)
-
-
-@router.message(EnterHandler.ch_mode, F.text.in_({"sequential", "thread", "process", "async"}))
-async def set_program_mode(message: Message, state: FSMContext):
-    AppConfig().change_mode(message.text)
-    await state.clear()
-    await message.answer(
-        text="Конфигурация программы успешно сохранена.",
-        reply_markup=get_start_menu()
-    )
 
 
 @router.message(EnterHandler.ch_mode)
