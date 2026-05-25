@@ -124,3 +124,12 @@ class AppConfig():
     def is_async_mode(self) -> bool:
         """Проверка, запущен ли асинхронный режим"""
         return self.execution_mode == ExecutionMode.ASYNC
+
+    def add_source(self, source: dict) -> None:
+        self.sources_list.append(source)
+
+    def reset_sources(self) -> None:
+        self.sources_list = []
+
+    def change_mode(self, mode: str) -> None:
+        self.execution_mode = mode

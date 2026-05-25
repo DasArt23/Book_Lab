@@ -2,6 +2,7 @@ import os
 from aiogram import Bot, Dispatcher
 from domain.constants import TOKEN
 import telegram.handlers.commands as commands
+import telegram.handlers.parsing as parsing
 from aiohttp import web
 
 
@@ -26,7 +27,7 @@ async def on_shutdown(dispatcher: Dispatcher, bot: Bot):
 async def run_bot():
     bot = Bot(token=TOKEN)
     dp = Dispatcher()
-    dp.include_routers(commands.router)
+    dp.include_routers(commands.router, parsing.router)
 
     dp.shutdown.register(on_shutdown)
 
