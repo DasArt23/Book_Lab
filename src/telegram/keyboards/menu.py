@@ -24,3 +24,30 @@ def add_sources():
     builder.row(KeyboardButton(text="Очистить"))
     builder.row(KeyboardButton(text="Просмотреть"))
     return builder.as_markup(resize_keyboard=True)
+
+
+def get_handlers_menu():
+    buttons = [
+        [KeyboardButton(text="Text_handler")],
+        [KeyboardButton(text="ID_handler")],
+        [KeyboardButton(text="Year_handler")]
+    ]
+    return ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True,
+        input_field_placeholder="Выберите тип обработчика"
+    )
+
+
+def get_modes_menu():
+    buttons = [
+        [KeyboardButton(text="sequential")],
+        [KeyboardButton(text="thread")],
+        [KeyboardButton(text="process")],
+        [KeyboardButton(text="async")]
+    ]
+    return ReplyKeyboardMarkup(
+        keyboard=buttons,
+        resize_keyboard=True,
+        input_field_placeholder="Выберите режим запуска"
+    )
