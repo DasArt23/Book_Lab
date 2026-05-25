@@ -6,7 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.filters import StateFilter
 from telegram.states import EnterNum, EnterPath, EnterHandler
 from config import AppConfig
-from useful import execute_main_and_build_json
+from telegram.useful import execute_main_and_build_json
 import os
 
 router = Router()
@@ -80,12 +80,6 @@ async def set_demo_source(message: Message):
         "Демо-источник успешно добавлен!\nХотите добавить еще источник?",
         reply_markup=add_sources(),
     )
-
-
-@router.message(StateFilter(None), F.text.lower() == "parse")
-async def get_json_path(message: Message, state: FSMContext):
-    await message.answer("Выберите, что хотите добавить")
-    await state.set_state(EnterPath.ch_path)
 
 
 @router.message(StateFilter(None), F.text.lower() == "parse")

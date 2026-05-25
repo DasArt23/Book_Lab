@@ -1,6 +1,6 @@
 import asyncio
 import inspect
-from main import main
+import main
 import json
 
 
