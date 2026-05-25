@@ -132,7 +132,7 @@ class AppConfig():
         self.sources_list = []
 
     def change_mode(self, mode: str) -> None:
-        self.execution_mode = mode
+        self.execution_mode = ExecutionMode(mode)
 
 
     def set_handler(self, handler_type: str, rec_id: int, threshold: int):
