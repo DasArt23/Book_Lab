@@ -6,41 +6,44 @@ import telegram.handlers.commands as commands
 import telegram.handlers.parsing as parsing
 from aiohttp import web
 
-
 async def handle(request):
     return web.Response(text="Bot is alive")
 
+async def bot_lifecycle(app: web.Application):
+    # Этот блок код выполняется ПРИ СТАРТЕ сервера
+    bot = Bot(token=TOKEN)
+    dp = Dispatcher()
+    dp.include_routers(commands.router, parsing.router)
 
-async def run_web_server():
+    await bot.delete_webhook(drop_pending_updates=True)
+
+    # Запускаем polling как фоновую задачу, которая не блокирует сервер
+    polling_task = asyncio.create_task(dp.start_polling(bot, polling_timeout=10))
+    print("Бот успешно запущен в фоне веб-сервера!")
+
+    yield # Здесь приложение работает. Код ниже выполнится ПРИ ВЫКЛЮЧЕНИИ сервера
+
+    print("Остановка бота...")
+    polling_task.cancel()
+    try:
+        await polling_task
+    except asyncio.CancelledError:
+        pass
+    await bot.session.close()
+    print("Бот полностью остановлен.")
+
+async def run_bot():
     app = web.Application()
     app.router.add_get('/', handle)
+    app.cleanup_ctx.append(bot_lifecycle)
 
     runner = web.AppRunner(app)
     await runner.setup()
 
     port = int(os.getenv("PORT", 10000))
     site = web.TCPSite(runner, "0.0.0.0", port)
+
+    print(# Начинаем слушать порт Render
+    f"Запуск веб-сервера на порту {port}...")
     await site.start()
-
-    while True:
-        await asyncio.sleep(3600)
-
-async def on_shutdown(dispatcher: Dispatcher, bot: Bot):
-    await bot.session.close()
-
-
-async def run_bot():
-    bot = Bot(token=TOKEN)
-    dp = Dispatcher()
-    dp.include_routers(commands.router, parsing.router)
-    dp.shutdown.register(on_shutdown)
-
-    await bot.delete_webhook(drop_pending_updates=True)
-
-    print("Запуск процессов...")
-
-    # Запускаем обе задачи параллельно. Теперь они делят Event Loop поровну.
-    await asyncio.gather(
-        run_web_server(),
-        dp.start_polling(bot, polling_timeout=10)
-    )
+    await asyncio.Event().wait()
