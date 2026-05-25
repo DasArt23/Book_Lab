@@ -133,3 +133,12 @@ class AppConfig():
 
     def change_mode(self, mode: str) -> None:
         self.execution_mode = mode
+
+
+    def set_handler(self, handler_type: str, rec_id: int, threshold: int):
+    self.handler_type = handler_type
+    self.handler_param = {
+        "rec_id": rec_id,
+        "treshold": threshold,
+    }
+
