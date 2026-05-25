@@ -92,6 +92,32 @@ async def show_genres(message: Message):
     )
 
 
+@router.message(StateFilter(None), F.text.lower().endswith("_handler"))
+async def handle_handler_selection(message: Message, state: FSMContext):
+    handler_text = message.text.lower()
+    if handler_text == "text_handler":
+        AppConfig().set_handler(
+            handler_type="text",
+            rec_id=505,
+            threshold=3
+        )
+        await message.answer(
+            text="✅ Выбран Text_handler\n\nВыберите режим запуска:",
+            reply_markup=get_modes_menu()
+        )
+        await state.set_state(EnterHandler.ch_mode)
+
+    elif handler_text == "id_handler":
+        await message.answer("Введите ID записи (rec_id):\n(по умолчанию: 505)")
+        await state.set_state(EnterHandler.ch_rec_id)
+        await state.update_data(h_type="id")
+
+    elif handler_text == "year_handler":
+        await message.answer("Введите порог года (threshold):\n(по умолчанию: 3)")
+        await state.set_state(EnterHandler.ch_threshold)
+        await state.update_data(h_type="year")
+
+
 @router.callback_query(F.data.startswith("page_"))
 async def process_page_change(callback: CallbackQuery):
     page = int(callback.data.split("_")[1])
@@ -140,7 +166,7 @@ async def view_config(message: Message):
 
 @router.message(StateFilter(None), F.text.lower() == "очистить")
 async def clear_config(message: Message):
-    AppConfig().clear_sources()
+    AppConfig().reset_sources()
     await message.answer("🗑 Источники очищены.")
 
 
