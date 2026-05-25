@@ -1,37 +1,49 @@
 import os
+import asyncio
 from aiogram import Bot, Dispatcher
 from domain.constants import TOKEN
 import telegram.handlers.commands as commands
+import telegram.handlers.parsing as parsing
 from aiohttp import web
-
 
 async def handle(request):
     return web.Response(text="Bot is alive")
 
-
-async def start_fake_server():
-    app = web.Application()
-    app.router.add_get('/', handle)
-    runner = web.AppRunner(app)
-    await runner.setup()
-    port = int(os.getenv("PORT", 10000))
-    site = web.TCPSite(runner, "0.0.0.0", port)
-    await site.start()
-
-
-async def on_shutdown(dispatcher: Dispatcher, bot: Bot):
-    await bot.session.close()
-
-
-async def run_bot():
+async def bot_lifecycle(app: web.Application):
+    # Этот блок код выполняется ПРИ СТАРТЕ сервера
     bot = Bot(token=TOKEN)
     dp = Dispatcher()
-    dp.include_routers(commands.router)
-
-    dp.shutdown.register(on_shutdown)
-
-    # Запускаем веб-сервер, чтобы Render одобрил деплой
-    await start_fake_server()
+    dp.include_routers(commands.router, parsing.router)
 
     await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot, polling_timeout=10)
+
+    # Запускаем polling как фоновую задачу, которая не блокирует сервер
+    polling_task = asyncio.create_task(dp.start_polling(bot, polling_timeout=10))
+    print("Бот успешно запущен в фоне веб-сервера!")
+
+    yield # Здесь приложение работает. Код ниже выполнится ПРИ ВЫКЛЮЧЕНИИ сервера
+
+    print("Остановка бота...")
+    polling_task.cancel()
+    try:
+        await polling_task
+    except asyncio.CancelledError:
+        pass
+    await bot.session.close()
+    print("Бот полностью остановлен.")
+
+async def run_bot():
+    app = web.Application()
+    app.router.add_get('/', handle)
+    app.cleanup_ctx.append(bot_lifecycle)
+
+    runner = web.AppRunner(app)
+    await runner.setup()
+
+    port = int(os.getenv("PORT", 10000))
+    site = web.TCPSite(runner, "0.0.0.0", port)
+
+    print(# Начинаем слушать порт Render
+    f"Запуск веб-сервера на порту {port}...")
+    await site.start()
+    await asyncio.Event().wait()
