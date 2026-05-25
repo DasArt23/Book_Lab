@@ -136,9 +136,9 @@ class AppConfig():
 
 
     def set_handler(self, handler_type: str, rec_id: int, threshold: int):
-    self.handler_type = handler_type
-    self.handler_param = {
-        "rec_id": rec_id,
-        "treshold": threshold,
-    }
+        self.handler_type = handler_type
+        self.handler_param = {
+            "rec_id": rec_id,
+            "treshold": threshold,
+        }
 
