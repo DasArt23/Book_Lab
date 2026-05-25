@@ -92,9 +92,10 @@ async def show_genres(message: Message):
     )
 
 
-@router.message(StateFilter(None), F.text.lower().endswith("_handler"))
+@router.message(EnterHandler.ch_type, F.text.lower().endswith("_handler"))
 async def handle_handler_selection(message: Message, state: FSMContext):
     handler_text = message.text.lower()
+
     if handler_text == "text_handler":
         AppConfig().set_handler(
             handler_type="text",
@@ -108,12 +109,16 @@ async def handle_handler_selection(message: Message, state: FSMContext):
         await state.set_state(EnterHandler.ch_mode)
 
     elif handler_text == "id_handler":
-        await message.answer("Введите ID записи (rec_id):\n(по умолчанию: 505)")
+        await message.answer(
+            text="Введите ID записи (rec_id):\n(по умолчанию: 505)"
+        )
         await state.set_state(EnterHandler.ch_rec_id)
         await state.update_data(h_type="id")
 
     elif handler_text == "year_handler":
-        await message.answer("Введите порог года (threshold):\n(по умолчанию: 3)")
+        await message.answer(
+            text="Введите порог года (threshold):\n(по умолчанию: 3)"
+        )
         await state.set_state(EnterHandler.ch_threshold)
         await state.update_data(h_type="year")
 
