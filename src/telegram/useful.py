@@ -11,7 +11,7 @@ def book_to_dict(book) -> dict:
 async def execute_main_and_build_json(user_id: int) -> str:
     # Запускаем main() в executor, так как внутри могут быть синхронные тяжелые вызовы
     loop = asyncio.get_running_loop()
-    app = await loop.run_in_executor(None, main)
+    app = await loop.run_in_executor(None, main.main)
 
     processed_books = []
 
