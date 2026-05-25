@@ -1,7 +1,7 @@
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery, FSInputFile
 from telegram.keyboards.menu import add_sources, get_handlers_menu, get_modes_menu, get_start_menu
-from telegram.inlineboards.genres import get_genres_keyboard
+from telegram.inlineboards.genres import get_genres_keyboard, get_genre_url
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import StateFilter
 from telegram.states import EnterNum, EnterPath, EnterHandler
@@ -135,14 +135,29 @@ async def process_page_change(callback: CallbackQuery):
 
 @router.callback_query(F.data.startswith("genre_"))
 async def process_genre_select(callback: CallbackQuery):
-    genre_name = callback.data.split("_")[1]
+    genre_slug = callback.data.split("_")[1]
 
-    # Добавление логики конфигурации
-    AppConfig().add_source({"source_type": "parse", "genre": genre_name})
-    await callback.message.answer(
-        text=f"Жанр «{genre_name.capitalize()}» успешно добавлен как источник!\nХотите добавить еще?",
-        reply_markup=add_sources() # Ваша Reply-клавиатура управления
-    )
+    # Получаем URL для жанра
+    genre_url = get_genre_url(genre_slug)
+
+    if genre_url:
+        AppConfig().add_source({
+            "source_type": "parse",
+            "urls": [genre_url]
+        })
+
+        # Красивое название для отображения
+        genre_display = genre_slug.replace('_', ' ').title()
+        await callback.message.answer(
+            text=f"Жанр «{genre_display}» успешно добавлен как источник!\n\nХотите добавить еще?",
+            reply_markup=add_sources()
+        )
+    else:
+        await callback.message.answer(
+            text=f"Извините, жанр не найден.",
+            reply_markup=add_sources()
+        )
+
     await callback.answer()
 
 
