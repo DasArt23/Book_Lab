@@ -21,58 +21,65 @@ class Application:
             max_workers=self.config.max_workers,
         )
         self.work_unit = BookWorkUnit(self.data_handler)
+        self.result = None
 
-    def run(self) -> Generator[tuple[Book, Book], None, None]:
+    def run(self) -> None:
         print(f"Запуск в режиме: {self.config.execution_mode.value}")
 
-        with ProcessTimer() as timer:
-            for source in self.sources:
-                for original, processed in self.mode_manager.execute(self.work_unit, source.get_books()):
-                    self.print_changes(original, processed, source.name)
-                    yield original, processed
+        def generator_sync():
+            with ProcessTimer() as timer:
+                for source in self.sources:
+                    for original, processed in self.mode_manager.execute(self.work_unit, source.get_books()):
+                        self.print_changes(original, processed, source.name)
+                        yield processed
+            dtime = timer.get_time()
+            self.statistics.display()
+            print(f"Время выполнения: {dtime:.3f} секунд")
+            print("Программа завершилась успешно")
 
-        dtime = timer.get_time()
-        self.statistics.display()
-        print(f"Время выполнения: {dtime:.3f} секунд")
-        print("Программа завершилась успешно")
+        self.result = generator_sync()
 
-    async def run_async(self) -> AsyncGenerator[tuple[Book, Book], None]:
+    async def run_async(self) -> None:
         print(f"Запуск в режиме: {self.config.execution_mode.value}")
 
-        with ProcessTimer() as timer:
-            for source in self.sources:
-                async for original, processed in self.mode_manager.execute_async(self.work_unit, source.get_books_async()):
-                    await self._print_changes_async(original, processed, source.name)
-                    self.statistics.add_received(source.name, 1)
-                    if original != processed:
-                        self.statistics.add_modified(source.name, 1)
-                    yield original, processed
+        async def generator_async():
+            with ProcessTimer() as timer:
+                for source in self.sources:
+                    async for original, processed in self.mode_manager.execute_async(self.work_unit, source.get_books_async()):
+                        await self._print_changes_async(original, processed, source.name)
+                        self.statistics.add_received(source.name, 1)
+                        if original != processed:
+                            self.statistics.add_modified(source.name, 1)
+                        yield processed
+            dtime = timer.get_time()
+            self.statistics.display()
+            print(f"Время выполнения: {dtime:.3f} секунд")
+            print("Программа завершилась успешно")
 
-        dtime = timer.get_time()
-        self.statistics.display()
-        print(f"Время выполнения: {dtime:.3f} секунд")
-        print("Программа завершилась успешно")
+        self.result = generator_async()
 
-    async def run_hybrid(self) -> AsyncGenerator[tuple[Book, Book], None]:
+    async def run_hybrid(self) -> None:
         print(f"Запуск в режиме: {self.config.execution_mode.value}")
 
-        with ProcessTimer() as timer:
-            for source in self.sources:
-                books = []
-                async for book in source.get_books_async():
-                    books.append(book)
+        async def generator_hybrid():
+            with ProcessTimer() as timer:
+                for source in self.sources:
+                    books = []
+                    async for book in source.get_books_async():
+                        books.append(book)
 
-                async for original, processed in self.mode_manager.execute_hybrid(self.work_unit, books):
-                    await self._print_changes_async(original, processed, source.name)
-                    self.statistics.add_received(source.name, 1)
-                    if original != processed:
-                        self.statistics.add_modified(source.name, 1)
-                    yield original, processed
+                    async for original, processed in self.mode_manager.execute_hybrid(self.work_unit, books):
+                        await self._print_changes_async(original, processed, source.name)
+                        self.statistics.add_received(source.name, 1)
+                        if original != processed:
+                            self.statistics.add_modified(source.name, 1)
+                        yield processed
+            dtime = timer.get_time()
+            self.statistics.display()
+            print(f"Время выполнения: {dtime:.3f} секунд")
+            print("Программа завершилась успешно")
 
-        dtime = timer.get_time()
-        self.statistics.display()
-        print(f"Время выполнения: {dtime:.3f} секунд")
-        print("Программа завершилась успешно")
+        self.result = generator_hybrid()
 
     def print_changes(self, old_book: Book, proc_book: Book, source_name: str) -> None:
         self.statistics.add_received(source_name, 1)
@@ -97,7 +104,6 @@ class Application:
                 val2 = getattr(book2, attr)
                 if val1 != val2:
                     print(f"  {attr.title()}: {val1} -> {val2}")
-
 
 class StatisticTracker:
     def __init__(self):
