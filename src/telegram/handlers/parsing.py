@@ -3,7 +3,7 @@ from aiogram.types import Message
 from telegram.keyboards.menu import add_sources
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import StateFilter
-from telegram.states import EnterNum
+from telegram.states import EnterNum, EnterPath
 from config import AppConfig
 
 router = Router()
@@ -27,6 +27,25 @@ async def not_num(message: Message, state: FSMContext):
         reply_markup=add_sources(),
     )
 
+@router.message(EnterPath.ch_path, F.text.strip().endswith('.json'))
+async def set_path(message: Message, state: FSMContext):
+    clean_path = message.text.strip()
+    AppConfig().add_source({"source_type": "json", "path": clean_path})
+    await state.update_data(json_path=clean_path)
+    await message.answer(
+        "Хотите добавить еще источник?",
+        reply_markup=add_sources(),
+    )
+
+@router.message(EnterPath.ch_path, F.text)
+async def not_path(message: Message, state: FSMContext):
+    DEFAULT_PATH = "json_files/proba.json"
+    AppConfig().add_source({"source_type": "json", "path": "json_files/proba.json"})
+    await state.update_data(json_path=DEFAULT_PATH)
+    await message.answer(
+        "Это не путь к json файлу.\nХотите добавить еще источник?",
+        reply_markup=add_sources(),
+    )
 
 @router.message(F.text.lower() == "получить книги")
 async def set_sources(message: Message):
@@ -40,3 +59,22 @@ async def set_sources(message: Message):
 async def get_rand_num(message: Message, state: FSMContext):
     await message.answer("Введите число случайных элементов")
     await state.set_state(EnterNum.ch_num)
+
+
+@router.message(StateFilter(None), F.text.lower() == "json")
+async def get_json_path(message: Message, state: FSMContext):
+    await message.answer("Введите путь до json файла")
+    await state.set_state(EnterPath.ch_path)
+
+@router.message(StateFilter(None), F.text.lower() == "demo")
+async def set_demo_source(message: Message):
+    AppConfig().add_source({"source_type": "demo"})
+    await message.answer(
+        "Демо-источник успешно добавлен!\nХотите добавить еще источник?",
+        reply_markup=add_sources(),
+    )
+
+@router.message(StateFilter(None), F.text.lower() == "parse")
+async def get_json_path(message: Message, state: FSMContext):
+    await message.answer("Выберите, что хотите добавить")
+    await state.set_state(EnterPath.ch_path)
