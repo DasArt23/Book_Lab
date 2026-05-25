@@ -22,4 +22,5 @@ def add_sources():
     builder.adjust(2)
     builder.add(KeyboardButton(text="Хватит"))
     builder.add(KeyboardButton(text="Очистить"))
+    builder.add(KeyboardButton(text="Просмотреть список источников"))
     return builder.as_markup(resize_keyboard=True)
