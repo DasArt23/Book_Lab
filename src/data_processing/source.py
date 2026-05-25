@@ -118,7 +118,7 @@ class Demo_source(Books_source):
 class Parse_source(Books_source):
 	_name = "Parse source"
 
-	def __init__(self, urls: list[str]):
+	def __init__(self, urls: list[str], **kwargs):
 		self.urls = urls
 		self.config = AppConfig()
 		self._rate_limiter = RateLimiter()
