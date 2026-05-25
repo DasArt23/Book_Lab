@@ -33,6 +33,7 @@ async def handle_rand_amount(message: Message, state: FSMContext):
     await state.clear()
 
 
+
 @router.message(EnterPath.ch_path, F.text.strip().endswith('.json'))
 async def set_path(message: Message, state: FSMContext):
     clean_path = message.text.strip()
@@ -44,6 +45,7 @@ async def set_path(message: Message, state: FSMContext):
     await state.clear()
 
 
+
 @router.message(EnterPath.ch_path, F.text)
 async def not_path(message: Message, state: FSMContext):
     DEFAULT_PATH = "json_files/proba.json"
@@ -53,6 +55,7 @@ async def not_path(message: Message, state: FSMContext):
         reply_markup=add_sources(),
     )
     await state.clear()
+
 
 
 @router.message(F.text.lower() == "получить книги")
